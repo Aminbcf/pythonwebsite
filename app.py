@@ -88,7 +88,7 @@ MODULES = {
                 {'name': 'Algebre 2', 'coefficient': 3},
                 {'name': 'Logic mathematique', 'coefficient': 3},
                 {'name': 'probabilites et statistique', 'coefficient': 2},
-                {'name': 'probabilites et statistique', 'coefficient': 1}
+                {'name': 'Thechniques d\'oral', 'coefficient': 1}
             ]
         },
         2: {
