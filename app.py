@@ -48,7 +48,7 @@ MODULES = {
                 {'name': 'Développement d\'Applications Web', 'credits': 2},
                 {'name': 'Langue étrangère 3', 'credits': 1}
             ]
-        },
+        }, 
         3: {  # Third Year
             1: [  # Semester 5
                 {'name': 'Système d\'information distribué', 'credits': 6},
