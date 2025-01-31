@@ -1,0 +1,692 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📊 Academic Grade Calculator</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Add your CSS here -->
+    <style>
+    :root {
+    --primary-color: #2563eb; /* Modern Blue */
+    --secondary-color: #1e40af; /* Darker Blue */
+    --background-color: #f8fafc; /* Light Background */
+    --text-color: #1e293b; /* Dark Text */
+    --card-background: #ffffff; /* White for Cards */
+    --card-border: #e2e8f0; /* Light Border for Cards */
+    --input-background: #ffffff; /* Input Background */
+    --input-border: #cbd5e1; /* Input Border */
+    --sidebar-width: 250px;
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-hover: 0 6px 12px -1px rgba(0, 0, 0, 0.15), 0 4px 8px -1px rgba(0, 0, 0, 0.1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+body {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.header {
+    background: var(--card-background);
+    padding: 1.5rem 2rem;
+    border-radius: 0.75rem;
+    box-shadow: var(--shadow);
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: box-shadow 0.3s ease;
+}
+
+.header:hover {
+    box-shadow: var(--shadow-hover);
+}
+
+.header h1 {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.header select {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--input-border);
+    border-radius: 0.5rem;
+    background: var(--input-background);
+    color: var(--text-color);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.header select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.calculator-card {
+    background: var(--card-background);
+    padding: 2rem;
+    border-radius: 0.75rem;
+    box-shadow: var(--shadow);
+    transition: box-shadow 0.3s ease;
+}
+
+.calculator-card:hover {
+    box-shadow: var(--shadow-hover);
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+select, input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--input-border);
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+select:focus, input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+.modules-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* Ensures a 3-column layout */
+    gap: 1.5rem;
+    margin: 1.5rem 0;
+}
+
+@media (max-width: 768px) {
+    .modules-grid {
+        grid-template-columns: repeat(2, 1fr); /* Adjust to 2 columns on smaller screens */
+    }
+}
+
+@media (max-width: 480px) {
+    .modules-grid {
+        grid-template-columns: 1fr; /* Single column on very small screens */
+    }
+}
+
+
+
+.module-card {
+    background: var(--card-background);
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    border: 1px solid var(--card-border);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.module-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-hover);
+}
+
+.module-card h3 {
+    margin-bottom: 1rem;
+    color: var(--primary-color);
+    font-size: 1.25rem;
+    word-wrap: break-word;
+}
+
+.module-info {
+    color: #64748b;
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+}
+
+.grade-inputs {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.grade-input {
+    flex: 1;
+    padding: 0.75rem;
+    border: 1px solid var(--input-border);
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.grade-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-primary {
+    background: var(--primary-color);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: var(--secondary-color);
+}
+
+.btn-secondary {
+    background: #64748b;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #475569;
+}
+
+.actions {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+.results-card {
+    background: var(--card-background);
+    padding: 2rem;
+    border-radius: 0.75rem;
+    margin-top: 2rem;
+    display: none;
+    box-shadow: var(--shadow);
+    transition: box-shadow 0.3s ease;
+}
+
+.results-card.visible {
+    display: block;
+}
+
+.results-card:hover {
+    box-shadow: var(--shadow-hover);
+}
+
+.results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.result-item {
+    text-align: center;
+    padding: 1.5rem;
+    background: var(--card-background);
+    border-radius: 0.75rem;
+    border: 1px solid var(--card-border);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.result-item:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-hover);
+}
+
+.result-value {
+    font-size: 1.75rem;
+    font-weight: bold;
+    color: var(--primary-color);
+    margin: 0.5rem 0;
+}
+
+.result-label {
+    color: #64748b;
+    font-size: 0.875rem;
+}
+
+.year-semester-selector {
+    display: flex;
+    justify-content: space-between;
+    gap: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+.year-semester-selector > div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.year-semester-selector button {
+    flex: 1;
+    padding: 0.75rem;
+    border: 1px solid var(--input-border);
+    border-radius: 0.5rem;
+    background: var(--input-background);
+    color: var(--text-color);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.year-semester-selector button.active {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem;
+    }
+
+    .header {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+
+    .modules-grid {
+        grid-template-columns: 3fr;
+    }
+
+    .year-semester-selector {
+        flex-direction: column;
+        gap: 1rem;
+    }
+}
+
+/* Additional Styles for Status */
+.result-status-container {
+    margin-top: 1.5rem;
+    text-align: center;
+}
+
+.result-status {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-top: 0.5rem;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+}
+
+.result-status.success {
+    background-color: #10b981; /* Green for success */
+    color: white;
+}
+
+.result-status.failure {
+    background-color: #ef4444; /* Red for failure */
+    color: white;
+}
+
+.result-status.eliminated {
+    background-color: #f97316; /* Orange for elimination */
+    color: white;
+}
+body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            padding: 2rem;
+            width: 100%;
+        }
+        .header {
+            background: #ffffff;
+            padding: 1.5rem 2rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #2563eb;
+            margin-bottom: 1rem;
+        }
+        .footer {
+            text-align: center;
+            padding: 1rem;
+            margin-top: auto;
+            font-size: 1rem;
+            color: #64748b;
+        }
+        .title {
+    font-size: 3rem; /* Make title bigger */
+    font-weight: bold;
+    text-align: center;
+    color: #2563eb;
+    margin-bottom: 1rem;
+}
+
+    </style>
+</head>
+<body>
+    <div class="container">
+    <!-- Centered Title -->
+    <h1 class="title">📊 Academic Grade Calculator</h1>
+
+    <div class="header">
+        <select id="studyType" onchange="handleChange()">
+            <option value="" disabled selected>Choose the Programme</option>
+            <option value="lmd">📚 LMD Studies</option>
+            <option value="engineering">🛠️ Engineering Studies</option>
+        </select>
+    </div>
+</div>
+
+
+        <div class="calculator-card">
+            <div class="year-semester-selector">
+                <div>
+                    <label>🎓 Academic Year</label>
+                    <div>
+                        <button onclick="changeYear(1)" class="year-button active">1st Year</button>
+                        <button onclick="changeYear(2)" class="year-button">2nd Year</button>
+                        <button onclick="changeYear(3)" class="year-button">3rd Year</button>
+                    </div>
+                </div>
+                <div>
+                    <label>📅 Semester</label>
+                    <div>
+                        <button onclick="changeSemester(1)" class="semester-button active">Semester 1</button>
+                        <button onclick="changeSemester(2)" class="semester-button">Semester 2</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="modulesContainer" class="modules-grid">
+                <!-- Modules will be loaded here -->
+            </div>
+
+            <div class="actions">
+                <button class="btn btn-secondary" onclick="clearFields()">
+                    <i class="fas fa-eraser"></i>
+                    Clear
+                </button>
+                <button class="btn btn-secondary" onclick="randomizeGrades()">
+                    <i class="fas fa-dice"></i>
+                    Randomize
+                </button>
+                <button class="btn btn-primary" onclick="calculateAverage()">
+                    <i class="fas fa-calculator"></i>
+                    Calculate Average
+                </button>
+            </div>
+
+            <div id="resultsCard" class="results-card">
+                <h2>📈 Results</h2>
+                <div class="results-grid">
+                    <div class="result-item">
+                        <div class="result-label">Semester Average</div>
+                        <div id="averageResult" class="result-value">0.00</div>
+                        <div class="result-label">out of 20</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">✅ Passing Modules</div>
+                        <div id="passingModules" class="result-value">0</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">❌ Failing Modules</div>
+                        <div id="failingModules" class="result-value">0</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">🏆 Highest Grade</div>
+                        <div id="highestGrade" class="result-value">0</div>
+                    </div>
+                </div>
+                <div class="result-status-container">
+                    <div class="result-label">Status</div>
+                    <div id="resultStatus" class="result-status">-</div>
+                </div>
+            </div>
+        </div>
+    </div>
+     <div class="footer">This website was built by Amine Boucif, Third Year Engineer.</div>
+
+    <script>
+        let currentModules = [];
+        let currentYear = 1;
+        let currentSemester = 1;
+
+        // Function to handle changes in study type, year, or semester
+        function handleChange() {
+            // Clear results and reload modules
+            document.getElementById('resultsCard').classList.remove('visible');
+            loadModules();
+        }
+
+        // Change academic year
+        function changeYear(year) {
+            currentYear = year;
+            // Remove active class from all year buttons
+            document.querySelectorAll('.year-semester-selector button.year-button').forEach(button => button.classList.remove('active'));
+            // Add active class to the clicked button
+            document.querySelector(`.year-semester-selector button.year-button:nth-child(${year})`).classList.add('active');
+            handleChange();
+        }
+
+        // Change semester
+        function changeSemester(semester) {
+            currentSemester = semester;
+            // Remove active class from all semester buttons
+            document.querySelectorAll('.year-semester-selector button.semester-button').forEach(button => button.classList.remove('active'));
+            // Add active class to the clicked button
+            document.querySelector(`.year-semester-selector button.semester-button:nth-child(${semester})`).classList.add('active');
+            handleChange();
+        }
+
+        // Randomize grades
+        function randomizeGrades() {
+            currentModules.forEach((_, index) => {
+                const examInput = document.getElementById(`exam-${index}`);
+                const tdInput = document.getElementById(`td-${index}`);
+                if (!examInput.value) examInput.value = (Math.random() * 20).toFixed(2);
+                if (!tdInput.value) tdInput.value = (Math.random() * 20).toFixed(2);
+            });
+        }
+
+        // Clear all fields
+        function clearFields() {
+            currentModules.forEach((_, index) => {
+                document.getElementById(`exam-${index}`).value = '';
+                document.getElementById(`td-${index}`).value = '';
+            });
+            document.getElementById('resultsCard').classList.remove('visible');
+        }
+
+        async function loadModules() {
+            const studyType = document.getElementById('studyType').value;
+            const year = currentYear;
+            const semester = currentSemester;
+
+            try {
+                const response = await fetch(`/api/modules?type=${studyType}&year=${year}&semester=${semester}`);
+                currentModules = await response.json();
+                renderModules();
+            } catch (error) {
+                console.error('Error loading modules:', error);
+                alert('Error loading modules. Please try again.');
+            }
+        }
+
+        function renderModules() {
+            const container = document.getElementById('modulesContainer');
+            container.innerHTML = '';
+
+            currentModules.forEach((module, index) => {
+                const card = document.createElement('div');
+                card.className = 'module-card';
+
+                const weightLabel = document.getElementById('studyType').value === 'lmd' ? 'Credits' : 'Coefficient';
+                const weightValue = module[document.getElementById('studyType').value === 'lmd' ? 'credits' : 'coefficient'];
+
+                card.innerHTML = `
+                    <h3>📘 ${module.name}</h3>
+                    <div class="module-info">${weightLabel}: ${weightValue}</div>
+                    <div class="grade-inputs">
+                        <input type="number"
+                               id="exam-${index}"
+                               min="0"
+                               max="20"
+                               step="0.25"
+                               placeholder="Exam Grade (0-20)"
+                               class="grade-input">
+                        <input type="number"
+                               id="td-${index}"
+                               min="0"
+                               max="20"
+                               step="0.25"
+                               placeholder="TD Grade (0-20)"
+                               class="grade-input">
+                    </div>
+                `;
+
+                container.appendChild(card);
+            });
+        }
+
+        async function calculateAverage() {
+            const grades = [];
+            const studyType = document.getElementById('studyType').value;
+
+            currentModules.forEach((module, index) => {
+                const examInput = document.getElementById(`exam-${index}`);
+                const tdInput = document.getElementById(`td-${index}`);
+
+                if (examInput.value && tdInput.value) {
+                    grades.push({
+                        ...module,
+                        exam: parseFloat(examInput.value),
+                        td: parseFloat(tdInput.value)
+                    });
+                }
+            });
+
+            if (grades.length === 0) {
+                alert('Please enter grades for at least one module');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/calculate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        study_type: studyType,
+                        grades: grades
+                    })
+                });
+
+                const data = await response.json();
+                displayResults(data, studyType, grades);
+            } catch (error) {
+                console.error('Error calculating average:', error);
+                alert('Error calculating average. Please try again.');
+            }
+        }
+
+        function displayResults(data, studyType, grades) {
+            const average = data.average;
+            const passingModules = data.statistics.passing_modules;
+            const failingModules = data.statistics.failing_modules;
+            const highestGrade = data.statistics.highest_grade;
+
+            // Update results card
+            document.getElementById('averageResult').textContent = average.toFixed(2);
+            document.getElementById('passingModules').textContent = passingModules;
+            document.getElementById('failingModules').textContent = failingModules;
+            document.getElementById('highestGrade').textContent = highestGrade.toFixed(2);
+
+            // Determine success, failure, or elimination
+            let resultStatus = '';
+            let resultClass = '';
+
+            if (studyType === 'lmd') {
+                if (average >= 10) {
+                    resultStatus = '✅ you cooked';
+                    resultClass = 'success';
+                } else {
+                    resultStatus = '❌ you are cooked';
+                    resultClass = 'failure';
+                }
+            } else if (studyType === 'engineering') {
+                // Check for elimination (any module grade < 5)
+                const hasElimination = grades.some(grade => {
+                    const moduleGrade = calculateModuleGrade(grade.exam, grade.td);
+                    return moduleGrade < 5;
+                });
+
+                if (hasElimination) {
+                    resultStatus = '⛔ Note eliminatoire :(';
+                    resultClass = 'eliminated';
+                } else if (average >= 10) {
+                    resultStatus = '✅ you cooked';
+                    resultClass = 'success';
+                } else {
+                    resultStatus = '❌ you are cooked ';
+                    resultClass = 'failure';
+                }
+            }
+
+            // Update result status in the results card
+            const resultStatusElement = document.getElementById('resultStatus');
+            resultStatusElement.textContent = resultStatus;
+            resultStatusElement.className = `result-status ${resultClass}`;
+
+            // Show results card
+            document.getElementById('resultsCard').classList.add('visible');
+        }
+
+        // Helper function to calculate module grade
+        function calculateModuleGrade(exam, td) {
+            return exam * 0.6 + td * 0.4;
+        }
+
+        // Load initial modules
+        loadModules();
+    </script>
+</body>
+</html>

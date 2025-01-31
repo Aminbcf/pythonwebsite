@@ -1,0 +1,202 @@
+        let currentModules = [];
+        let currentYear = 1;
+        let currentSemester = 1;
+
+        // Function to handle changes in study type, year, or semester
+        function handleChange() {
+            // Clear results and reload modules
+            document.getElementById('resultsCard').classList.remove('visible');
+            loadModules();
+        }
+
+        // Change academic year
+        function changeYear(year) {
+            currentYear = year;
+            // Remove active class from all year buttons
+            document.querySelectorAll('.year-semester-selector button.year-button').forEach(button => button.classList.remove('active'));
+            // Add active class to the clicked button
+            document.querySelector(`.year-semester-selector button.year-button:nth-child(${year})`).classList.add('active');
+            handleChange();
+        }
+
+        // Change semester
+        function changeSemester(semester) {
+            currentSemester = semester;
+            // Remove active class from all semester buttons
+            document.querySelectorAll('.year-semester-selector button.semester-button').forEach(button => button.classList.remove('active'));
+            // Add active class to the clicked button
+            document.querySelector(`.year-semester-selector button.semester-button:nth-child(${semester})`).classList.add('active');
+            handleChange();
+        }
+
+        // Randomize grades
+        function randomizeGrades() {
+            currentModules.forEach((_, index) => {
+                const examInput = document.getElementById(`exam-${index}`);
+                const tdInput = document.getElementById(`td-${index}`);
+                if (!examInput.value) examInput.value = (Math.random() * 20).toFixed(2);
+                if (!tdInput.value) tdInput.value = (Math.random() * 20).toFixed(2);
+            });
+        }
+
+        // Clear all fields
+        function clearFields() {
+            currentModules.forEach((_, index) => {
+                document.getElementById(`exam-${index}`).value = '';
+                document.getElementById(`td-${index}`).value = '';
+            });
+            document.getElementById('resultsCard').classList.remove('visible');
+        }
+
+        async function loadModules() {
+            const studyType = document.getElementById('studyType').value;
+            const year = currentYear;
+            const semester = currentSemester;
+
+            try {
+                const response = await fetch(`/api/modules?type=${studyType}&year=${year}&semester=${semester}`);
+                currentModules = await response.json();
+                renderModules();
+            } catch (error) {
+                console.error('Error loading modules:', error);
+                alert('Error loading modules. Please try again.');
+            }
+        }
+
+        function renderModules() {
+            const container = document.getElementById('modulesContainer');
+            container.innerHTML = '';
+
+            currentModules.forEach((module, index) => {
+                const card = document.createElement('div');
+                card.className = 'module-card';
+
+                const weightLabel = document.getElementById('studyType').value === 'lmd' ? 'Credits' : 'Coefficient';
+                const weightValue = module[document.getElementById('studyType').value === 'lmd' ? 'credits' : 'coefficient'];
+
+                card.innerHTML = `
+                    <h3>📘 ${module.name}</h3>
+                    <div class="module-info">${weightLabel}: ${weightValue}</div>
+                    <div class="grade-inputs">
+                        <input type="number"
+                               id="exam-${index}"
+                               min="0"
+                               max="20"
+                               step="0.25"
+                               placeholder="Exam Grade (0-20)"
+                               class="grade-input">
+                        <input type="number"
+                               id="td-${index}"
+                               min="0"
+                               max="20"
+                               step="0.25"
+                               placeholder="TD Grade (0-20)"
+                               class="grade-input">
+                    </div>
+                `;
+
+                container.appendChild(card);
+            });
+        }
+
+        async function calculateAverage() {
+            const grades = [];
+            const studyType = document.getElementById('studyType').value;
+
+            currentModules.forEach((module, index) => {
+                const examInput = document.getElementById(`exam-${index}`);
+                const tdInput = document.getElementById(`td-${index}`);
+
+                if (examInput.value && tdInput.value) {
+                    grades.push({
+                        ...module,
+                        exam: parseFloat(examInput.value),
+                        td: parseFloat(tdInput.value)
+                    });
+                }
+            });
+
+            if (grades.length === 0) {
+                alert('Please enter grades for at least one module');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/calculate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        study_type: studyType,
+                        grades: grades
+                    })
+                });
+
+                const data = await response.json();
+                displayResults(data, studyType, grades);
+            } catch (error) {
+                console.error('Error calculating average:', error);
+                alert('Error calculating average. Please try again.');
+            }
+        }
+
+        function displayResults(data, studyType, grades) {
+            const average = data.average;
+            const passingModules = data.statistics.passing_modules;
+            const failingModules = data.statistics.failing_modules;
+            const highestGrade = data.statistics.highest_grade;
+
+            // Update results card
+            document.getElementById('averageResult').textContent = average.toFixed(2);
+            document.getElementById('passingModules').textContent = passingModules;
+            document.getElementById('failingModules').textContent = failingModules;
+            document.getElementById('highestGrade').textContent = highestGrade.toFixed(2);
+
+            // Determine success, failure, or elimination
+            let resultStatus = '';
+            let resultClass = '';
+
+            if (studyType === 'lmd') {
+                if (average >= 10) {
+                    resultStatus = '✅ you cooked';
+                    resultClass = 'success';
+                } else {
+                    resultStatus = '❌ you are cooked';
+                    resultClass = 'failure';
+                }
+            } else if (studyType === 'engineering') {
+                // Check for elimination (any module grade < 5)
+                const hasElimination = grades.some(grade => {
+                    const moduleGrade = calculateModuleGrade(grade.exam, grade.td);
+                    return moduleGrade < 5;
+                });
+
+                if (hasElimination) {
+                    resultStatus = '⛔ Note eliminatoire :(';
+                    resultClass = 'eliminated';
+                } else if (average >= 10) {
+                    resultStatus = '✅ you cooked';
+                    resultClass = 'success';
+                } else {
+                    resultStatus = '❌ you are cooked ';
+                    resultClass = 'failure';
+                }
+            }
+
+            // Update result status in the results card
+            const resultStatusElement = document.getElementById('resultStatus');
+            resultStatusElement.textContent = resultStatus;
+            resultStatusElement.className = `result-status ${resultClass}`;
+
+            // Show results card
+            document.getElementById('resultsCard').classList.add('visible');
+        }
+
+        // Helper function to calculate module grade
+        function calculateModuleGrade(exam, td) {
+            return exam * 0.6 + td * 0.4;
+        }
+
+        // Load initial modules
+        loadModules();
