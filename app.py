@@ -51,13 +51,13 @@ MODULES = {
         }, 
         3: {  # Third Year
             1: [  # Semester 5
-                {'name': 'Système d\'information distribué', 'credits': 6},
-                {'name': 'Système d\'aide à la décision', 'credits': 4},
-                {'name': 'Génie Logiciel', 'credits': 6},
-                {'name': 'Interface Homme Machine', 'credits': 4},
-                {'name': 'Administration des Systèmes d\'information', 'credits': 4},
-                {'name': 'Programmation avancée pour le Web', 'credits': 4},
-                {'name': 'Economie numérique et veille stratégique', 'credits': 2}
+                {'name': 'Système d\'information distribué', 'credits': 4},
+                {'name': 'Système d\'aide à la décision', 'credits': 2},
+                {'name': 'Génie Logiciel', 'credits': 4},
+                {'name': 'Interface Homme Machine', 'credits': 2},
+                {'name': 'Administration des Systèmes d\'information', 'credits': 2},
+                {'name': 'Programmation avancée pour le Web', 'credits': 2},
+                {'name': 'Economie numérique et veille stratégique', 'credits': 1}
             ],
             2: [  # Semester 6
                 {'name': 'Recherche d\'information', 'credits': 5},
